@@ -22,12 +22,21 @@
         height: 100%;
         margin: 0;
         padding: 0;
-        overflow: hidden;
-      }
+        overflow: hidden;}
     </style>
   </head>
   <body>
     <div id="cesiumContainer"></div>
-    <script type="text/javascript" src="../src/main.js"></script>
+    <button style="position: absolute;left: 0%;top: 0%;" onclick="addAntenna()">Antenna</button>
+    <button style="position: absolute;left: 0%;top: 5%;" onclick="addReceiver()">Receiver</button>
+    <!-- <button style="position: absolute;left: 0%;top: 15%;" onclick="handleClickCalculate()">Calculate</button> -->
+
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="../dependency/math.js"></script>
+    <script type="text/javascript" src="../dependency/proj4-src.js"></script>
+    <script type="text/javascript" src="../dependency/proj4.js"></script>
+    <script type="text/javascript" src="../dependency/jsts.js"></script>
+    <script type="text/javascript" src="../src/main4_semester.js"></script>
+
   </body>
 </html>
