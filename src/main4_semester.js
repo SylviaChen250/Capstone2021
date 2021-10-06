@@ -1,11 +1,64 @@
 // var reader = new jsts.io.WKTReader();
 // var a = reader.read('POLYGON ((1 1,5 1,5 5,1 5,0.5 4,1 1))');
+
+// const { string } = require("yargs");
+
 // var b = reader.read('POLYGON ((1 1,5 1,5 5,1 5,1 1))');
 var lam = 0.001;
 // var difference = a.difference(b);
 // console.log(difference);
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkYzkxZjc2MC03MWY2LTRkYjMtOGJkYy1hNTY5MmQ2MTdiMTgiLCJpZCI6NjEzOTQsImlhdCI6MTYyNjA1MTY2MH0.KU9MmCBbaayiw6PGwuNp7qP0jRphMYWMzCvRQnIMQ9g'
 var viewer = new Cesium.Viewer("cesiumContainer");
+
+//环绕飞行
+//    var options = {
+
+//                 lng: 144.9678,
+//                  lat: -37.81573,
+//                  height: 300,
+//                  heading: 0.0,
+//                  pitch: 0.0,
+//                 roll: 0.0
+//              };
+// var position = Cesium.Cartesian3.fromDegrees(options.lng, options.lat, options.height);
+// // 相机看点的角度，如果大于0那么则是从地底往上看，所以要为负值，这里取-30度
+//     var pitch = Cesium.Math.toRadians(-30);
+//     // 给定飞行一周所需时间，比如10s, 那么每秒转动度数
+//     var angle = 360 / 30;
+//     // 给定相机距离点多少距离飞行，这里取值为5000m
+//     var distance = 5000;
+//     var startTime = Cesium.JulianDate.fromDate(new Date());
+
+//    // var stopTime = Cesium.JulianDate.addSeconds(startTime, 10, new Cesium.JulianDate());
+
+//     viewer.clock.startTime = startTime.clone();  // 开始时间
+//    // viewer.clock.stopTime = stopTime.clone();     // 结速时间
+//     viewer.clock.currentTime = startTime.clone(); // 当前时间
+//     viewer.clock.clockRange = Cesium.ClockRange.CLAMPED; // 行为方式
+//     viewer.clock.clockStep = Cesium.ClockStep.SYSTEM_CLOCK; // 时钟设置为当前系统时间; 忽略所有其他设置。
+//     // 相机的当前heading
+//     var initialHeading = viewer.camera.heading;
+//     var Exection = function TimeExecution() {
+//             // 当前已经过去的时间，单位s
+//             var delTime = Cesium.JulianDate.secondsDifference(viewer.clock.currentTime, viewer.clock.startTime);
+//             var heading = Cesium.Math.toRadians(delTime * angle) + initialHeading;
+//             viewer.scene.camera.setView({
+//                 destination :position, // 点的坐标
+//                 orientation:{
+//                     heading: heading,
+//                     pitch : pitch,
+
+//                 }
+//             });
+//             viewer.scene.camera.moveBackward(distance);
+
+//        if (Cesium.JulianDate.compare(viewer.clock.currentTime, viewer.clock.stopTime) >= 0) {
+//                 viewer.clock.onTick.removeEventListener(Exection);
+//             }
+//     };
+
+//     viewer.clock.onTick.addEventListener(Exection);
+
 
 // viewer.dataSources.add(ray_dataSource);
 
@@ -18,28 +71,38 @@ viewer.scene.globe.depthTestAgainstTerrain = true;
 // var webMercatorProjection = new Cesium.WebMercatorProjection(viewer.scene.globe.ellipsoid);
 // var viewPointWebMercator = webMercatorProjection.project(Cesium.Cartographic.fromCartesian(viewPoint));
 // console.log('scene',viewer.scene.entities);
+viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(144.9678, -37.81573, 10000000) });
+setTimeout(() => {
+  viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(144.99053424, -37.81174189, 200) });
 
+}, 6000);
 var instrumentFlag = null;
 var calculationStatus = null;
 function addAntenna() {
   // createPoint()
   instrumentFlag = 'antenna';
-  console.log(instrumentFlag)
+  //console.log(instrumentFlag)
 }
 function addReceiver() {
   // createPoint()
   instrumentFlag = 'receiver';
-  console.log('?', instrumentFlag)
+  //console.log('?', instrumentFlag)
+}
+function addRelay() {
+  // createPoint()
+  instrumentFlag = 'relay';
+  //console.log('?', instrumentFlag)
 }
 
 var antennaArray = [];
 var receiverArray = [];
+let relayArray = [];
 
 function handleClickCalculate() {
   calculationStatus = 'ok';
 }
 
-viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(144.9678, -37.81573, 1000) });
+// viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(144.9678, -37.81573, 1000) });
 
 var melmodel;
 var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
@@ -119,7 +182,7 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
           for (let ent_len_id = 0; ent_len_id <= ent_len - 1; ent_len_id++) {
             // var top_vex=[]
             //console.log('gggg',json.features[ent_len_id].material)
-            var matrl=json.features[ent_len_id].material
+            var matrl = json.features[ent_len_id].material
             var num_pt = json.features[ent_len_id].geometry.coordinates[0][0].length;
             //循环建筑物底面的每个顶点
             for (let i = 0; i <= num_pt - 2; i++) {
@@ -152,7 +215,7 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
               var d_pl = math.dot(nmal_unit, pt1);
               //console.log(d_pl);
               //把当前面的法向量和d参数都存在pl_set中
-              pl_set.push([nmal_unit, d_pl,matrl]);
+              pl_set.push([nmal_unit, d_pl, matrl]);
               //试一下每个面的normal算对没有
               var pt4 = math.divide(math.add(pt2, pt3), 2);
               var pt5 = math.add(pt4, nmal_unit);
@@ -173,7 +236,7 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
               //最后再在pl_set中存一个顶面参数(循环到最后一个点时)
               if (i == num_pt - 2) {
                 var d_pl = math.dot([0, 0, 1], math.subtract(pt3, pt3h));
-                pl_set.push([[0, 0, 1], d_pl,matrl]);
+                pl_set.push([[0, 0, 1], d_pl, matrl]);
                 // vertex_lt.push(top_vex)
               }
 
@@ -200,8 +263,12 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
     viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(
       Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK
     );
+    var count_receiver = 0;
+    var count_antenna = 0;
+    var count_relay = 0;
     function createPoint(worldPosition) {
       if (instrumentFlag === 'receiver') {
+        count_receiver += 1;
         var point = viewer.entities.add({
           position: worldPosition,
           point: {
@@ -210,7 +277,7 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
             heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
           },
           label: {
-            text: 'receiver',
+            text: 'receiver' + count_receiver,
             font: '500 50px Helvetica',
             scale: 0.5,
             style: Cesium.LabelStyle.FILL,
@@ -221,7 +288,8 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
         });
         // console.log('point', viewer.entities);
         return point;
-      } else {
+      } else if (instrumentFlag === 'antenna') {
+        count_antenna += 1;
         var point = viewer.entities.add({
           position: worldPosition,
           point: {
@@ -230,11 +298,32 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
             heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
           },
           label: {
-            text: 'Antenna',
+            text: 'Antenna' + count_antenna,
             font: '500 50px Helvetica',
             scale: 0.5,
             style: Cesium.LabelStyle.FILL,
             fillColor: Cesium.Color.RED,
+            pixelOffset: new Cesium.Cartesian2(-8, -35),
+            showBackgroundColor: new Cesium.Color(0.5, 0.6, 1, 1.0)
+          }
+        });
+        // console.log('point', viewer.entities);
+        return point;
+      } else if (instrumentFlag === 'relay') {
+        count_relay += 1
+        var point = viewer.entities.add({
+          position: worldPosition,
+          point: {
+            color: Cesium.Color.YELLOW,
+            pixelSize: 10,
+            heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
+          },
+          label: {
+            text: 'Relay' + count_relay,
+            font: '500 50px Helvetica',
+            scale: 0.5,
+            style: Cesium.LabelStyle.FILL,
+            fillColor: Cesium.Color.YELLOW,
             pixelOffset: new Cesium.Cartesian2(-8, -35),
             showBackgroundColor: new Cesium.Color(0.5, 0.6, 1, 1.0)
           }
@@ -285,7 +374,7 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
           },
         });
         //120-130dB
-      }else if (dist > 80 && dist <= 250) {
+      } else if (dist > 80 && dist <= 250) {
         var shape = viewer.entities.add({
 
           polyline: {
@@ -330,8 +419,11 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
         if (instrumentFlag === 'receiver') {
           receiverArray.push(earthPosition);
           // console.log(1);
-        } else {
+        } else if (instrumentFlag === 'antenna') {
           antennaArray.push(earthPosition);
+          // console.log(2);
+        } else if (instrumentFlag === 'relay') {
+          relayArray.push(earthPosition);
           // console.log(2);
         }
       }
@@ -339,132 +431,241 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
 
 
 
-
+    var nodeArray = [];
 
     handler.setInputAction(function (movement) {
+
       if (receiverArray.length > 0 && antennaArray.length > 0) {
-        PL_list_all=[]
-        receiverArray.forEach((ray_end) => {
-          //var PL=math.square(math.divide(lam,math.multiply(math.multiply(4,math.pi),d)))
-          var PL_list = [];
-          antennaArray.forEach((ray_start) => {
-            var PL = 0;
-            var PL_dB=0
-            var start_to_end = math.distance([ray_start.x, ray_start.y, ray_start.z], [ray_end.x, ray_end.y, ray_end.z]);
-            if (start_to_end < 500) {
+        if (relayArray.length == 0) {
+          console.log('hhhhhhhh');
+          PL_list_all = []
+          receiverArray.forEach((ray_end) => {
+            //var PL=math.square(math.divide(lam,math.multiply(math.multiply(4,math.pi),d)))
+            var PL_list = [];
+            antennaArray.forEach((ray_start) => {
+              var PL = 0;
+              var PL_dB = 0
+              var start_to_end = math.distance([ray_start.x, ray_start.y, ray_start.z], [ray_end.x, ray_end.y, ray_end.z]);
+              if (start_to_end < 500) {
 
 
-              // ray_start = new Cesium.Cartesian3.fromDegrees(144.9903761, -37.81169252, 6)
-              // ray_end = earthPosition
-              var ray_dir_los =
-                Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(ray_end, ray_start, new Cesium.Cartesian3()), new Cesium.Cartesian3());
-              var ray = new Cesium.Ray(ray_start, ray_dir_los);
-              var hitPos = viewer.scene.pickFromRay(ray, []);
-              console.log('hitpos', hitPos)
-              // floatingPoint2 = createPoint(hitPos);
-              var start_to_hit = math.distance([ray_start.x, ray_start.y, ray_start.z], [hitPos.position.x, hitPos.position.y, hitPos.position.z])
-              console.log([start_to_hit, start_to_end]);
-              // var point1 = viewer.entities.add({
-              //   position: hitPos.position,
-              //   point: {
-              //     color: Cesium.Color.LIME,
-              //     pixelSize: 10,
-              //     heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
-              //   },
-              // });
-              if (((hitPos == undefined) && (hitPos == null)) || (start_to_hit > start_to_end) || math.abs(math.subtract(start_to_hit, start_to_end)) < 0.1) {
-                var PL = math.add(PL, math.square(math.divide(math.multiply(math.multiply(4, math.pi), start_to_end),lam)));
-                var PL_dB = math.multiply(10,math.log10(PL))
-                // debugger
-                createLine(start_to_end, ray_start, ray_end);
-
-              }
-              //转换发射点的坐标到proj4
-              var l_pos0 = viewer.scene.globe.ellipsoid.cartesianToCartographic(ray_start);
-              var pt0_lon = Cesium.Math.toDegrees(l_pos0.longitude);
-              var pt0_lat = Cesium.Math.toDegrees(l_pos0.latitude);
-              var trans_pos0 = proj4(fromProjection, toProjection, [pt0_lon, pt0_lat, l_pos0.height]);
-              //转换接收点的坐标到proj4
-              var l_pos1 = viewer.scene.globe.ellipsoid.cartesianToCartographic(ray_end);
-              var pt1_lon = Cesium.Math.toDegrees(l_pos1.longitude);
-              var pt1_lat = Cesium.Math.toDegrees(l_pos1.latitude);
-              var trans_pos1 = proj4(fromProjection, toProjection, [pt1_lon, pt1_lat, l_pos1.height]);
-
-              for (let j = 0; j <= pl_set.length - 1; j++) {
-                var cur_nmal = pl_set[j][0];
-                var cur_d = pl_set[j][1];
-                
-                //接收点与发射点的对称点的连线
-                var t_dist = math.divide(math.subtract(cur_d, math.dot(trans_pos0, cur_nmal)), math.dot(cur_nmal, cur_nmal));
-                var imagPoint_start = math.add(trans_pos0, math.multiply(cur_nmal, math.multiply(t_dist, 2)));
-                var imag_degree_start = proj4(toProjection, fromProjection, imagPoint_start);
-                var imag_cart3_start = Cesium.Cartesian3.fromDegrees(imag_degree_start[0], imag_degree_start[1], imag_degree_start[2]);
-                var end_to_start_imag = math.distance([ray_end.x, ray_end.y, ray_end.z], [imag_cart3_start.x, imag_cart3_start.y, imag_cart3_start.z]);
-                
-                if (end_to_start_imag < 500) {
+                // ray_start = new Cesium.Cartesian3.fromDegrees(144.9903761, -37.81169252, 6)
+                // ray_end = earthPosition
+                var ray_dir_los =
+                  Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(ray_end, ray_start, new Cesium.Cartesian3()), new Cesium.Cartesian3());
+                var ray = new Cesium.Ray(ray_start, ray_dir_los);
+                var hitPos = viewer.scene.pickFromRay(ray, []);
+                console.log('hitpos', hitPos)
+                // floatingPoint2 = createPoint(hitPos);
+                var start_to_hit = math.distance([ray_start.x, ray_start.y, ray_start.z], [hitPos.position.x, hitPos.position.y, hitPos.position.z])
+                console.log([start_to_hit, start_to_end]);
+                // var point1 = viewer.entities.add({
+                //   position: hitPos.position,
+                //   point: {
+                //     color: Cesium.Color.LIME,
+                //     pixelSize: 10,
+                //     heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
+                //   },
+                // });
+                if (((hitPos == undefined) && (hitPos == null)) || (start_to_hit > start_to_end) || math.abs(math.subtract(start_to_hit, start_to_end)) < 0.1) {
+                  var PL = math.add(PL, math.square(math.divide(math.multiply(math.multiply(4, math.pi), start_to_end), lam)));
+                  var PL_dB = math.multiply(10, math.log10(PL))
                   // debugger
-                  // console.log('hhhhh',end_to_start_imag);
-                  var ray_dir_imag_start =
-                    Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(imag_cart3_start, ray_end, new Cesium.Cartesian3()), new Cesium.Cartesian3());
-                  var ray_imag_start = new Cesium.Ray(ray_end, ray_dir_imag_start);
+                  createLine(start_to_end, ray_start, ray_end);
 
-                  var hitPos_imag_start = viewer.scene.pickFromRay(ray_imag_start, []);
+                }
+                //转换发射点的坐标到proj4
+                var l_pos0 = viewer.scene.globe.ellipsoid.cartesianToCartographic(ray_start);
+                var pt0_lon = Cesium.Math.toDegrees(l_pos0.longitude);
+                var pt0_lat = Cesium.Math.toDegrees(l_pos0.latitude);
+                var trans_pos0 = proj4(fromProjection, toProjection, [pt0_lon, pt0_lat, l_pos0.height]);
+                //转换接收点的坐标到proj4
+                var l_pos1 = viewer.scene.globe.ellipsoid.cartesianToCartographic(ray_end);
+                var pt1_lon = Cesium.Math.toDegrees(l_pos1.longitude);
+                var pt1_lat = Cesium.Math.toDegrees(l_pos1.latitude);
+                var trans_pos1 = proj4(fromProjection, toProjection, [pt1_lon, pt1_lat, l_pos1.height]);
+               
+                for (let j = 0; j <= pl_set.length - 1; j++) {
+                  // console.log('gggggggg');
+                  var cur_nmal = pl_set[j][0];
+                  var cur_d = pl_set[j][1];
 
-                  //发射点与接收点的对称点的连线
-                  var t_dist1 = math.divide(math.subtract(cur_d, math.dot(trans_pos1, cur_nmal)), math.dot(cur_nmal, cur_nmal));
-                  var imagPoint_end = math.add(trans_pos1, math.multiply(cur_nmal, math.multiply(t_dist1, 2)));
-                  var imag_degree_end = proj4(toProjection, fromProjection, imagPoint_end);
-                  var imag_cart3_end = Cesium.Cartesian3.fromDegrees(imag_degree_end[0], imag_degree_end[1], imag_degree_end[2]);
-                  var ray_dir_imag_end =
-                    Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(imag_cart3_end, ray_start, new Cesium.Cartesian3()), new Cesium.Cartesian3());
-                  var ray_imag_end = new Cesium.Ray(ray_start, ray_dir_imag_end);
+                  //接收点与发射点的对称点的连线
+                  var t_dist = math.divide(math.subtract(cur_d, math.dot(trans_pos0, cur_nmal)), math.dot(cur_nmal, cur_nmal));
+                  var imagPoint_start = math.add(trans_pos0, math.multiply(cur_nmal, math.multiply(t_dist, 2)));
+                  var imag_degree_start = proj4(toProjection, fromProjection, imagPoint_start);
+                  var imag_cart3_start = Cesium.Cartesian3.fromDegrees(imag_degree_start[0], imag_degree_start[1], imag_degree_start[2]);
+                  var end_to_start_imag = math.distance([ray_end.x, ray_end.y, ray_end.z], [imag_cart3_start.x, imag_cart3_start.y, imag_cart3_start.z]);
+                  
+                  if (end_to_start_imag < 1000) {
+                    
+                    // debugger
+                    // console.log('hhhhh',end_to_start_imag);
+                    var ray_dir_imag_start =
+                      Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(imag_cart3_start, ray_end, new Cesium.Cartesian3()), new Cesium.Cartesian3());
+                    var ray_imag_start = new Cesium.Ray(ray_end, ray_dir_imag_start);
 
-                  var hitPos_imag_end = viewer.scene.pickFromRay(ray_imag_end, []);
-                  if ((hitPos_imag_start !== undefined) && (hitPos_imag_start !== null) && (hitPos_imag_end !== undefined) && (hitPos_imag_end !== null)) {
-                    // var temp=hitPos_imag_start.position.x-hitPos_imag_end.postion.x;
-                    var aaax = hitPos_imag_start.position.x;
-                    var bbbx = hitPos_imag_end.position.x;
-                    var aaay = hitPos_imag_start.position.y;
-                    var bbby = hitPos_imag_end.position.y;
-                    var aaaz = hitPos_imag_start.position.z;
-                    var bbbz = hitPos_imag_end.position.z;
-                    var matrl_ref=pl_set[j][2]
-                    if (math.abs(math.subtract(aaax, bbbx)) <= 0.1 && math.abs(math.subtract(aaay, bbby)) <= 0.1 && math.abs(math.subtract(aaaz, bbbz)) <= 0.1) {
-                      var start_to_hit_imag = math.distance([ray_start.x, ray_start.y, ray_start.z], [aaax, aaay, aaaz]);
-                      var end_to_hit_imag = math.distance([ray_end.x, ray_end.y, ray_end.z], [aaax, aaay, aaaz]);
-                      var fst_ray_len = math.add(start_to_hit_imag, end_to_hit_imag);
-                      var PL = math.square(math.divide(math.multiply(math.multiply(4, math.pi), fst_ray_len),lam));
-                      var PL_dB=math.add(PL_dB, math.multiply(10,math.log10(PL))+matrl_ref);
-                      createLine(math.add(fst_ray_len, 15), ray_start, hitPos_imag_end.position);
-                      createLine(math.add(fst_ray_len, 15), hitPos_imag_end.position, ray_end);
+                    var hitPos_imag_start = viewer.scene.pickFromRay(ray_imag_start, []);
+
+                    //发射点与接收点的对称点的连线
+                    var t_dist1 = math.divide(math.subtract(cur_d, math.dot(trans_pos1, cur_nmal)), math.dot(cur_nmal, cur_nmal));
+                    var imagPoint_end = math.add(trans_pos1, math.multiply(cur_nmal, math.multiply(t_dist1, 2)));
+                    var imag_degree_end = proj4(toProjection, fromProjection, imagPoint_end);
+                    var imag_cart3_end = Cesium.Cartesian3.fromDegrees(imag_degree_end[0], imag_degree_end[1], imag_degree_end[2]);
+                    var ray_dir_imag_end =
+                      Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(imag_cart3_end, ray_start, new Cesium.Cartesian3()), new Cesium.Cartesian3());
+                    var ray_imag_end = new Cesium.Ray(ray_start, ray_dir_imag_end);
+
+                    var hitPos_imag_end = viewer.scene.pickFromRay(ray_imag_end, []);
+                    if ((hitPos_imag_start !== undefined) && (hitPos_imag_start !== null) && (hitPos_imag_end !== undefined) && (hitPos_imag_end !== null)) {
+                      // var temp=hitPos_imag_start.position.x-hitPos_imag_end.postion.x;
+                      var aaax = hitPos_imag_start.position.x;
+                      var bbbx = hitPos_imag_end.position.x;
+                      var aaay = hitPos_imag_start.position.y;
+                      var bbby = hitPos_imag_end.position.y;
+                      var aaaz = hitPos_imag_start.position.z;
+                      var bbbz = hitPos_imag_end.position.z;
+                      var matrl_ref = pl_set[j][2]
+                      if (math.abs(math.subtract(aaax, bbbx)) <= 0.1 && math.abs(math.subtract(aaay, bbby)) <= 0.1 && math.abs(math.subtract(aaaz, bbbz)) <= 0.1) {
+                        var start_to_hit_imag = math.distance([ray_start.x, ray_start.y, ray_start.z], [aaax, aaay, aaaz]);
+                        var end_to_hit_imag = math.distance([ray_end.x, ray_end.y, ray_end.z], [aaax, aaay, aaaz]);
+                        var fst_ray_len = math.add(start_to_hit_imag, end_to_hit_imag);
+                        var PL = math.square(math.divide(math.multiply(math.multiply(4, math.pi), fst_ray_len), lam));
+                        var PL_dB = math.add(PL_dB, math.multiply(10, math.log10(PL)) + matrl_ref);
+                       
+                        createLine(math.add(fst_ray_len, 15), ray_start, hitPos_imag_end.position);
+                        createLine(math.add(fst_ray_len, 15), hitPos_imag_end.position, ray_end);
 
 
 
 
 
 
+                      }
                     }
                   }
+
                 }
 
+                PL_list.push(math.multiply(10, math.log10(PL)));
               }
 
-              PL_list.push(math.multiply(10,math.log10(PL)));
-            }
+            })
+            PL_list_all.push(PL_list)
+            //console.log(math.max(PL_list));
 
           })
-          PL_list_all.push(PL_list)
-          //console.log(math.max(PL_list));
-
-        })
 
 
 
+
+          console.log('path_loss_list', PL_list_all)
+          // console.log(entity_array);
+          console.log('end');
+        } else {
+          receiverArray.forEach((ray_end) => {
+            antennaArray.forEach((ray_start) => {
+              var min_dist = 0;
+              relayArray.push(ray_end);
+              console.log('relayarray', relayArray);
+              // console.log('relayArray',relayArray);
+              // var nodeArray=new Array(relayArray[0],relayArray[1],relayArray[2]);
+              let nodeArray = relayArray.slice(0, relayArray.length);
+              // let nodeArray=relayArray;
+
+              // relayArray.forEach((rl) => {
+              //   nodeArray.push(rl);
+              // });
+              console.log('first_nodearray', nodeArray);
+              var compl_nodes = [];
+              var dist_nodes = new Array(nodeArray.length).fill(Infinity);
+              var last_node = new Array(nodeArray.length).fill(Infinity);
+              compl_nodes.push(ray_start);
+              var is_break = 0;
+              while (compl_nodes.indexOf(ray_end) === -1) {
+                var start_now = compl_nodes[math.subtract(compl_nodes.length, 1)];
+
+                console.log('compl_nodes', compl_nodes);
+
+                nodeArray.forEach((node) => {
+                  if (node !== Infinity) {
+                    console.log('node', node);
+                    console.log('start_now', start_now);
+                    var ray_dir_los = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(node, start_now, new Cesium.Cartesian3()), new Cesium.Cartesian3());
+                    var ray = new Cesium.Ray(start_now, ray_dir_los);
+                    console.log('ray_dir_los', ray_dir_los);
+                    var hitPos = viewer.scene.pickFromRay(ray, []);
+
+                    // console.log('start_now',start_now);
+                    // console.log('hitPos',hitPos.position);
+                    var start_to_hit = math.distance([start_now.x, start_now.y, start_now.z], [hitPos.position.x, hitPos.position.y, hitPos.position.z]);
+                    var start_to_end = math.distance([start_now.x, start_now.y, start_now.z], [node.x, node.y, node.z]);
+                    if (((hitPos == undefined) && (hitPos == null)) || (start_to_hit > start_to_end) || math.abs(math.subtract(start_to_hit, start_to_end)) < 0.1) {
+                      var start_to_node = min_dist + start_to_end;
+                      console.log('44444444', start_to_node);
+                      console.log('55555555', dist_nodes[relayArray.indexOf(node)]);
+                      if (start_to_node < dist_nodes[relayArray.indexOf(node)]) {
+                        dist_nodes[relayArray.indexOf(node)] = start_to_node;
+                        last_node[relayArray.indexOf(node)] = compl_nodes[math.subtract(compl_nodes.length, 1)];
+                        console.log('222222', compl_nodes[compl_nodes.length - 1]);
+                        console.log('3333333', [relayArray[0], relayArray[1], relayArray[2]]);
+                      }
+                    }
+                    console.log('dist_nodes', dist_nodes);
+                  }
+
+                })
+                //
+
+                var min_dist = math.min(dist_nodes);
+                if (min_dist !== Infinity) {
+                  compl_nodes.push(relayArray[dist_nodes.indexOf(min_dist)]);
+                  console.log('min_dist', min_dist);
+                  //在nodeArray中pop掉当前遍历到的node
+                  nodeArray[dist_nodes.indexOf(min_dist)] = Infinity;
+                  // nodeArray.splice(dist_nodes.indexOf(min_dist),1);
+                  console.log('nodearray', nodeArray);
+
+                  dist_nodes[dist_nodes.indexOf(min_dist)] = Infinity;
+                } else {
+                  var is_break = 1;
+                  break;
+                }
+              }
+              //
+
+              if (is_break === 1) {
+                console.log('NO ROUTE!!!')
+              } else {
+                console.log('dist_nodes', dist_nodes);
+                console.log('last_node', last_node);
+                var route_array = [];
+                route_array.push(ray_end);
+                var route_node = last_node[last_node.length - 1];
+                route_array.push(route_node);
+                while (route_node !== ray_start) {
+                  var index_now = relayArray.indexOf(route_node);
+                  route_node = last_node[index_now];
+                  route_array.push(route_node);
+
+
+                }
+                console.log('route_array', route_array);
+                var PL = math.square(math.divide(math.multiply(math.multiply(4, math.pi), min_dist), lam));
+                var PL_dB = math.multiply(10, math.log10(PL))
+                console.log('pathloss(dB) for shortest distance', PL_dB);
+                for (let i = 0; i <= route_array.length - 2; i++) {
+                  // console.log('i and i+1',route_array[i],route_array[i+1]);
+                  createLine(min_dist, route_array[i], route_array[i + 1]);
+                }
+              }
+
+            })
+
+          })
+
+        }
       }
-      console.log('path_loss_list',PL_list_all)
-      // console.log(entity_array);
-      console.log('end');
-
 
     }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
