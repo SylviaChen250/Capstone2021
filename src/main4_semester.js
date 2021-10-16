@@ -71,11 +71,11 @@ viewer.scene.globe.depthTestAgainstTerrain = true;
 // var webMercatorProjection = new Cesium.WebMercatorProjection(viewer.scene.globe.ellipsoid);
 // var viewPointWebMercator = webMercatorProjection.project(Cesium.Cartographic.fromCartesian(viewPoint));
 // console.log('scene',viewer.scene.entities);
-viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(144.9678, -37.81573, 10000000) });
-setTimeout(() => {
+// viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(144.9678, -37.81573, 10000000) });
+// setTimeout(() => {
   viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(144.99053424, -37.81174189, 200) });
 
-}, 6000);
+// }, 6000);
 var instrumentFlag = null;
 var calculationStatus = null;
 function addAntenna() {
@@ -563,107 +563,263 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
           // console.log(entity_array);
           console.log('end');
         } else {
+          // receiverArray.forEach((ray_end) => {
+          //   antennaArray.forEach((ray_start) => {
+          //     var min_dist = 0;
+          //     relayArray.push(ray_end);
+          //     console.log('relayarray', relayArray);
+          //     // console.log('relayArray',relayArray);
+          //     // var nodeArray=new Array(relayArray[0],relayArray[1],relayArray[2]);
+          //     let nodeArray = relayArray.slice(0, relayArray.length);
+          //     // let nodeArray=relayArray;
+
+          //     // relayArray.forEach((rl) => {
+          //     //   nodeArray.push(rl);
+          //     // });
+          //     console.log('first_nodearray', nodeArray);
+          //     var compl_nodes = [];
+          //     var dist_nodes = new Array(nodeArray.length).fill(Infinity);
+          //     var last_node = new Array(nodeArray.length).fill(Infinity);
+          //     compl_nodes.push(ray_start);
+          //     var is_break = 0;
+          //     while (compl_nodes.indexOf(ray_end) === -1) {
+          //       var start_now = compl_nodes[math.subtract(compl_nodes.length, 1)];
+
+          //       console.log('compl_nodes', compl_nodes);
+
+          //       nodeArray.forEach((node) => {
+          //         if (node !== Infinity) {
+          //           console.log('node', node);
+          //           console.log('start_now', start_now);
+          //           var ray_dir_los = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(node, start_now, new Cesium.Cartesian3()), new Cesium.Cartesian3());
+          //           var ray = new Cesium.Ray(start_now, ray_dir_los);
+          //           console.log('ray_dir_los', ray_dir_los);
+          //           var hitPos = viewer.scene.pickFromRay(ray, []);
+
+          //           // console.log('start_now',start_now);
+          //           // console.log('hitPos',hitPos.position);
+          //           var start_to_hit = math.distance([start_now.x, start_now.y, start_now.z], [hitPos.position.x, hitPos.position.y, hitPos.position.z]);
+          //           var start_to_end = math.distance([start_now.x, start_now.y, start_now.z], [node.x, node.y, node.z]);
+          //           if (((hitPos == undefined) && (hitPos == null)) || (start_to_hit > start_to_end) || math.abs(math.subtract(start_to_hit, start_to_end)) < 0.1) {
+          //             var start_to_node = min_dist + start_to_end;
+          //             console.log('44444444', start_to_node);
+          //             console.log('55555555', dist_nodes[relayArray.indexOf(node)]);
+          //             if (start_to_node < dist_nodes[relayArray.indexOf(node)]) {
+          //               dist_nodes[relayArray.indexOf(node)] = start_to_node;
+          //               last_node[relayArray.indexOf(node)] = compl_nodes[math.subtract(compl_nodes.length, 1)];
+          //               console.log('222222', compl_nodes[compl_nodes.length - 1]);
+          //               console.log('3333333', [relayArray[0], relayArray[1], relayArray[2]]);
+          //             }
+          //           }
+          //           console.log('dist_nodes', dist_nodes);
+          //         }
+
+          //       })
+          //       //
+
+          //       var min_dist = math.min(dist_nodes);
+          //       if (min_dist !== Infinity) {
+          //         compl_nodes.push(relayArray[dist_nodes.indexOf(min_dist)]);
+          //         console.log('min_dist', min_dist);
+          //         //在nodeArray中pop掉当前遍历到的node
+          //         nodeArray[dist_nodes.indexOf(min_dist)] = Infinity;
+          //         // nodeArray.splice(dist_nodes.indexOf(min_dist),1);
+          //         console.log('nodearray', nodeArray);
+
+          //         dist_nodes[dist_nodes.indexOf(min_dist)] = Infinity;
+          //       } else {
+          //         var is_break = 1;
+          //         break;
+          //       }
+          //     }
+          //     //
+
+          //     if (is_break === 1) {
+          //       console.log('NO ROUTE!!!')
+          //     } else {
+          //       console.log('dist_nodes', dist_nodes);
+          //       console.log('last_node', last_node);
+          //       var route_array = [];
+          //       route_array.push(ray_end);
+          //       var route_node = last_node[last_node.length - 1];
+          //       route_array.push(route_node);
+          //       while (route_node !== ray_start) {
+          //         var index_now = relayArray.indexOf(route_node);
+          //         route_node = last_node[index_now];
+          //         route_array.push(route_node);
+
+
+          //       }
+          //       console.log('route_array', route_array);
+          //       var PL = math.square(math.divide(math.multiply(math.multiply(4, math.pi), min_dist), lam));
+          //       var PL_dB = math.multiply(10, math.log10(PL))
+          //       console.log('pathloss(dB) for shortest distance', PL_dB);
+          //       for (let i = 0; i <= route_array.length - 2; i++) {
+          //         // console.log('i and i+1',route_array[i],route_array[i+1]);
+          //         createLine(min_dist, route_array[i], route_array[i + 1]);
+          //       }
+          //     }
+
+          //   })
+
+          // })
           receiverArray.forEach((ray_end) => {
             antennaArray.forEach((ray_start) => {
-              var min_dist = 0;
-              relayArray.push(ray_end);
-              console.log('relayarray', relayArray);
-              // console.log('relayArray',relayArray);
-              // var nodeArray=new Array(relayArray[0],relayArray[1],relayArray[2]);
-              let nodeArray = relayArray.slice(0, relayArray.length);
-              // let nodeArray=relayArray;
 
-              // relayArray.forEach((rl) => {
-              //   nodeArray.push(rl);
-              // });
-              console.log('first_nodearray', nodeArray);
-              var compl_nodes = [];
-              var dist_nodes = new Array(nodeArray.length).fill(Infinity);
-              var last_node = new Array(nodeArray.length).fill(Infinity);
-              compl_nodes.push(ray_start);
-              var is_break = 0;
-              while (compl_nodes.indexOf(ray_end) === -1) {
-                var start_now = compl_nodes[math.subtract(compl_nodes.length, 1)];
+              //存每条边的list和他们相应的长度
+              var path_list=[];
+              var path_len_list=[];
+              var old_node_list=[];
 
-                console.log('compl_nodes', compl_nodes);
+              var result_path=[];
+              var group_list=[];
 
-                nodeArray.forEach((node) => {
-                  if (node !== Infinity) {
-                    console.log('node', node);
-                    console.log('start_now', start_now);
-                    var ray_dir_los = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(node, start_now, new Cesium.Cartesian3()), new Cesium.Cartesian3());
-                    var ray = new Cesium.Ray(start_now, ray_dir_los);
-                    console.log('ray_dir_los', ray_dir_los);
+              var cur_ant_min=Infinity;
+              var cur_ant_min_id=0;
+
+              var count=0;
+
+  
+              let node_list=relayArray.slice(0, relayArray.length);
+              node_list.push(ray_start);
+              node_list.push(ray_end);
+              console.log(node_list,'node_list');
+              for (let i = 0; i <= node_list.length-1; i++) {
+                var node1=node_list[i];
+                for (let j = 0; j <= node_list.length-1; j++) {
+                  var node2=node_list[j];
+                  if (node2!==node1 && (old_node_list.indexOf(node2)===-1)){
+                    // console.log('node1111',node1);
+                    var ray_dir_los = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(node2, node1, new Cesium.Cartesian3()), new Cesium.Cartesian3());
+                    var ray = new Cesium.Ray(node1, ray_dir_los);
                     var hitPos = viewer.scene.pickFromRay(ray, []);
-
-                    // console.log('start_now',start_now);
-                    // console.log('hitPos',hitPos.position);
-                    var start_to_hit = math.distance([start_now.x, start_now.y, start_now.z], [hitPos.position.x, hitPos.position.y, hitPos.position.z]);
-                    var start_to_end = math.distance([start_now.x, start_now.y, start_now.z], [node.x, node.y, node.z]);
-                    if (((hitPos == undefined) && (hitPos == null)) || (start_to_hit > start_to_end) || math.abs(math.subtract(start_to_hit, start_to_end)) < 0.1) {
-                      var start_to_node = min_dist + start_to_end;
-                      console.log('44444444', start_to_node);
-                      console.log('55555555', dist_nodes[relayArray.indexOf(node)]);
-                      if (start_to_node < dist_nodes[relayArray.indexOf(node)]) {
-                        dist_nodes[relayArray.indexOf(node)] = start_to_node;
-                        last_node[relayArray.indexOf(node)] = compl_nodes[math.subtract(compl_nodes.length, 1)];
-                        console.log('222222', compl_nodes[compl_nodes.length - 1]);
-                        console.log('3333333', [relayArray[0], relayArray[1], relayArray[2]]);
+                    var point1 = viewer.entities.add({
+                      position: hitPos.position,
+                      point: {
+                      color: Cesium.Color.LIME,
+                      pixelSize: 10,
+                      heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
+                      },
+                    });
+                    var start_to_hit = math.distance([node1.x, node1.y, node1.z], [hitPos.position.x, hitPos.position.y, hitPos.position.z]);
+                    var start_to_end = math.distance([node1.x, node1.y, node1.z], [node2.x, node2.y, node2.z]);
+                    console.log('[node1,node2]',[node1,node2]);
+                    console.log('hitPos',hitPos);
+                    console.log('hit_len',[start_to_hit,start_to_end]);
+                    if (((hitPos == undefined) && (hitPos == null)) || (start_to_hit > start_to_end) || math.abs(math.subtract(start_to_hit, start_to_end)) < 0.1){
+                      console.log('[node1,node2] in path_list',[node1,node2]);
+                      path_list.push([node1,node2]);
+                      count=count+1; 
+                      var node_dist=math.distance([node1.x,node1.y,node1.z],[node2.x,node2.y,node2.z]);
+                      path_len_list.push(node_dist);
+                      if (node1===ray_start || node2===ray_start){
+                        if (node_dist<cur_ant_min){
+                          cur_ant_min=node_dist;
+                          cur_ant_min_id=count-1;
+                          console.log('ray_start_min_id',cur_ant_min_id);
+                        }
                       }
-                    }
-                    console.log('dist_nodes', dist_nodes);
-                  }
-
-                })
-                //
-
-                var min_dist = math.min(dist_nodes);
-                if (min_dist !== Infinity) {
-                  compl_nodes.push(relayArray[dist_nodes.indexOf(min_dist)]);
-                  console.log('min_dist', min_dist);
-                  //在nodeArray中pop掉当前遍历到的node
-                  nodeArray[dist_nodes.indexOf(min_dist)] = Infinity;
-                  // nodeArray.splice(dist_nodes.indexOf(min_dist),1);
-                  console.log('nodearray', nodeArray);
-
-                  dist_nodes[dist_nodes.indexOf(min_dist)] = Infinity;
-                } else {
-                  var is_break = 1;
+                    } 
+                  } 
+                }
+                old_node_list.push(node1);     
+              }
+              console.log('path_list',path_list);
+              console.log('path_len_list',path_len_list);
+              result_path.push(path_list[cur_ant_min_id]);
+              group_list.push(path_list[cur_ant_min_id]);
+              path_len_list[cur_ant_min_id]=Infinity;
+              
+              
+              while (true){
+                var cur_min_path=math.min(path_len_list); //找当前最小path
+                if (cur_min_path===Infinity){
+                  alert('oops, no result!');
                   break;
                 }
-              }
-              //
+                var cur_min_id=path_len_list.indexOf(cur_min_path);
+                var cur_node1=path_list[cur_min_id][0];
+                var cur_node2=path_list[cur_min_id][1];
+                var not_new=0;
+                console.log('group_list',group_list);
+                for (let k = 0; k <= group_list.length-1; k++){  //循环group_list，找node1或node2存在的行
+                  
+                  // console.log('cur_node1',cur_node1);
+                  // console.log('group_list[k]',group_list[k]);
+                
+                  if (group_list[k].indexOf(cur_node1)!==-1){   //如果node1先出现
+                    not_new=1;
+                    console.log('11111');
+                    if (group_list[k].indexOf(cur_node2)===-1){  //如果node1的行没有node2
+                      group_list[k].push(cur_node2);
+                      for (let k1=k+1;  k1 <= group_list.length-1; k1++){  //循环接下来的group_list,看接下来的组里有没有node2
+                        if (group_list[k1].indexOf(cur_node2)!==-1){
+                          group_list[k1].forEach((node)=>{  //有的话就合并k和k1
+                            if (node!==cur_node2){
+                              group_list[k].push(node);
+                              group_list.splice(k1,1); //并删掉被合并的k1
+                            }
+                          })
+                        }
 
-              if (is_break === 1) {
-                console.log('NO ROUTE!!!')
-              } else {
-                console.log('dist_nodes', dist_nodes);
-                console.log('last_node', last_node);
-                var route_array = [];
-                route_array.push(ray_end);
-                var route_node = last_node[last_node.length - 1];
-                route_array.push(route_node);
-                while (route_node !== ray_start) {
-                  var index_now = relayArray.indexOf(route_node);
-                  route_node = last_node[index_now];
-                  route_array.push(route_node);
+                      }
+                      result_path.push(path_list[cur_min_id]); //接下来的group有咩有node都把path加到result里
+                      path_len_list[cur_min_id]=Infinity;
+                      break;
+                    }else{
+                      path_len_list[cur_min_id]=Infinity;
+                      break;
+                    }
+                  }else if(group_list[k].indexOf(cur_node2)!==-1){   //如果node2先出现
+                    not_new=1;
+                    console.log('222222')
+                    if (group_list[k].indexOf(cur_node1)===-1){  //如果node2的行没有node1
+                      group_list[k].push(cur_node1);
+                      for (let k1=k+1;  k1 <= group_list.length-1; k1++){  //循环接下来的group_list,看接下来的组里有没有node2
+                        if (group_list[k1].indexOf(cur_node1)!==-1){
+                          group_list[k1].forEach((node)=>{  //有的话就合并k和k1
+                            if (node!==cur_node1){
+                              group_list[k].push(node);
+                              group_list.splice(k1,1); //并删掉被合并的k1
+                            }
+                          })
+                        }
 
+                      }
+                      result_path.push(path_list[cur_min_id]); //接下来的group有咩有node都把path加到result里
+                      path_len_list[cur_min_id]=Infinity;
+                      break;
+                    }else{
+                      path_len_list[cur_min_id]=Infinity;
+                      break;
+                    }
+                  }
 
+               
+                 
+                 
                 }
-                console.log('route_array', route_array);
-                var PL = math.square(math.divide(math.multiply(math.multiply(4, math.pi), min_dist), lam));
-                var PL_dB = math.multiply(10, math.log10(PL))
-                console.log('pathloss(dB) for shortest distance', PL_dB);
-                for (let i = 0; i <= route_array.length - 2; i++) {
-                  // console.log('i and i+1',route_array[i],route_array[i+1]);
-                  createLine(min_dist, route_array[i], route_array[i + 1]);
+                if (not_new===0){
+                  console.log('3333')
+                  result_path.push(path_list[cur_min_id]); 
+                  path_len_list[cur_min_id]=Infinity;
+                  group_list.push(path_list[cur_min_id]);
                 }
+                // console.log('ray_end',ray_end);
+                // console.log('group_list[0]',group_list[0]);
+                if (group_list[0].indexOf((ray_end))!==-1){
+                  break;
+                }
+                
               }
-
+              // console.log('group_list',group_list);
+              console.log('result_path',result_path);
+              for (let i=0; i<=result_path.length-1;i++){
+                createLine(20, result_path[i][0], result_path[i][1]);
+              }  
+               
             })
-
           })
-
         }
       }
 
@@ -699,3 +855,4 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
 
 });
 
+ 
