@@ -342,7 +342,7 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
             positions: [r1, r2],
             arcType: Cesium.ArcType.NONE,
             clampToGround: false,
-            width: 3,
+            width: 5,
             material: Cesium.Color.fromCssColorString('#7a0177'),
             glowPower: 0.5,
           },
@@ -355,7 +355,7 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
             positions: [r1, r2],
             arcType: Cesium.ArcType.NONE,
             clampToGround: false,
-            width: 3,
+            width: 5,
             material: Cesium.Color.fromCssColorString('#c51b8a'),
             glowPower: 0.5,
           },
@@ -368,7 +368,7 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
             positions: [r1, r2],
             arcType: Cesium.ArcType.NONE,
             clampToGround: false,
-            width: 3,
+            width: 5,
             material: Cesium.Color.fromCssColorString('#f768a1'),
             glowPower: 0.5,
           },
@@ -381,7 +381,7 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
             positions: [r1, r2],
             arcType: Cesium.ArcType.NONE,
             clampToGround: false,
-            width: 3,
+            width: 5,
             material: Cesium.Color.fromCssColorString('#fbb4b9'),
             glowPower: 0.5,
           },
@@ -390,6 +390,69 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
       }
       entity_array.push(shape);
     }
+
+    
+    function dfs(final_path, AR_result, node_start, receiver) {
+      var is_in = 0;
+      // debugger;
+      //找final_path里还有没有node_start
+      for (let i = 0; i <= final_path.length - 1; i++) {
+          if (final_path[i].indexOf(node_start) !== -1) {
+            is_in = 1;
+              
+            break;
+          }
+      }
+     
+      if (is_in === 0) {
+       
+        AR_result.pop();
+        
+        return;
+      }
+      
+  
+      for (let i = 0; i <= final_path.length - 1; i++) {
+          if (final_path[i].indexOf(node_start) != -1) {
+              //算对应的end_node
+              var end_node = final_path[i].filter((node) => {
+                  // console.log(node);
+                  return node!==node_start
+              });
+              //删掉next_path在final_path中的这一行
+              AR_result.push(final_path[i]);
+              final_path[i]=[0,0];
+              if (end_node[0] === receiver) {
+                  is_receive=1;
+                  final_result=AR_result.slice(0,AR_result.length);
+                  console.log(final_result);
+                  for (let i=0; i<=final_result.length-1;i++){
+                    var shape = viewer.entities.add({
+                      polyline: {
+                        positions: [final_result[i][0], final_result[i][1]],
+                        arcType: Cesium.ArcType.NONE,
+                        clampToGround: false,
+                        width: 3,
+                        material: Cesium.Color.GREEN,
+                        glowPower: 0.5,
+                      },
+                    });
+                    // createLine(20, final_result[i][0], final_result[i][1]);
+                  }
+                  break;
+              }
+              dfs(final_path, AR_result, end_node[0], receiver);
+              
+          }
+      }
+      
+      AR_result.pop();
+      
+      
+  
+  }  
+      
+    
 
     //交互
     var activeShapePoints = [];
@@ -563,106 +626,107 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
           // console.log(entity_array);
           console.log('end');
         } else {
-          // receiverArray.forEach((ray_end) => {
-          //   antennaArray.forEach((ray_start) => {
-          //     var min_dist = 0;
-          //     relayArray.push(ray_end);
-          //     console.log('relayarray', relayArray);
-          //     // console.log('relayArray',relayArray);
-          //     // var nodeArray=new Array(relayArray[0],relayArray[1],relayArray[2]);
-          //     let nodeArray = relayArray.slice(0, relayArray.length);
-          //     // let nodeArray=relayArray;
+          receiverArray.forEach((ray_end) => {
+            antennaArray.forEach((ray_start) => {
+              var min_dist = 0;
+              relayArray.push(ray_end);
+              console.log('relayarray', relayArray);
+              // console.log('relayArray',relayArray);
+              // var nodeArray=new Array(relayArray[0],relayArray[1],relayArray[2]);
+              let nodeArray = relayArray.slice(0, relayArray.length);
+              // let nodeArray=relayArray;
 
-          //     // relayArray.forEach((rl) => {
-          //     //   nodeArray.push(rl);
-          //     // });
-          //     console.log('first_nodearray', nodeArray);
-          //     var compl_nodes = [];
-          //     var dist_nodes = new Array(nodeArray.length).fill(Infinity);
-          //     var last_node = new Array(nodeArray.length).fill(Infinity);
-          //     compl_nodes.push(ray_start);
-          //     var is_break = 0;
-          //     while (compl_nodes.indexOf(ray_end) === -1) {
-          //       var start_now = compl_nodes[math.subtract(compl_nodes.length, 1)];
+              // relayArray.forEach((rl) => {
+              //   nodeArray.push(rl);
+              // });
+              console.log('first_nodearray', nodeArray);
+              var compl_nodes = [];
+              var dist_nodes = new Array(nodeArray.length).fill(Infinity);
+              var last_node = new Array(nodeArray.length).fill(Infinity);
+              compl_nodes.push(ray_start);
+              var is_break = 0;
+              while (compl_nodes.indexOf(ray_end) === -1) {
+                var start_now = compl_nodes[math.subtract(compl_nodes.length, 1)];
 
-          //       console.log('compl_nodes', compl_nodes);
+                console.log('compl_nodes', compl_nodes);
 
-          //       nodeArray.forEach((node) => {
-          //         if (node !== Infinity) {
-          //           console.log('node', node);
-          //           console.log('start_now', start_now);
-          //           var ray_dir_los = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(node, start_now, new Cesium.Cartesian3()), new Cesium.Cartesian3());
-          //           var ray = new Cesium.Ray(start_now, ray_dir_los);
-          //           console.log('ray_dir_los', ray_dir_los);
-          //           var hitPos = viewer.scene.pickFromRay(ray, []);
+                nodeArray.forEach((node) => {
+                  if (node !== Infinity) {
+                    console.log('node', node);
+                    console.log('start_now', start_now);
+                    var ray_dir_los = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(node, start_now, new Cesium.Cartesian3()), new Cesium.Cartesian3());
+                    var ray = new Cesium.Ray(start_now, ray_dir_los);
+                    console.log('ray_dir_los', ray_dir_los);
+                    var hitPos = viewer.scene.pickFromRay(ray, []);
 
-          //           // console.log('start_now',start_now);
-          //           // console.log('hitPos',hitPos.position);
-          //           var start_to_hit = math.distance([start_now.x, start_now.y, start_now.z], [hitPos.position.x, hitPos.position.y, hitPos.position.z]);
-          //           var start_to_end = math.distance([start_now.x, start_now.y, start_now.z], [node.x, node.y, node.z]);
-          //           if (((hitPos == undefined) && (hitPos == null)) || (start_to_hit > start_to_end) || math.abs(math.subtract(start_to_hit, start_to_end)) < 0.1) {
-          //             var start_to_node = min_dist + start_to_end;
-          //             console.log('44444444', start_to_node);
-          //             console.log('55555555', dist_nodes[relayArray.indexOf(node)]);
-          //             if (start_to_node < dist_nodes[relayArray.indexOf(node)]) {
-          //               dist_nodes[relayArray.indexOf(node)] = start_to_node;
-          //               last_node[relayArray.indexOf(node)] = compl_nodes[math.subtract(compl_nodes.length, 1)];
-          //               console.log('222222', compl_nodes[compl_nodes.length - 1]);
-          //               console.log('3333333', [relayArray[0], relayArray[1], relayArray[2]]);
-          //             }
-          //           }
-          //           console.log('dist_nodes', dist_nodes);
-          //         }
+                    // console.log('start_now',start_now);
+                    // console.log('hitPos',hitPos.position);
+                    var start_to_hit = math.distance([start_now.x, start_now.y, start_now.z], [hitPos.position.x, hitPos.position.y, hitPos.position.z]);
+                    var start_to_end = math.distance([start_now.x, start_now.y, start_now.z], [node.x, node.y, node.z]);
+                    if (((hitPos == undefined) && (hitPos == null)) || (start_to_hit > start_to_end) || math.abs(math.subtract(start_to_hit, start_to_end)) < 0.1) {
+                      var start_to_node = min_dist + start_to_end;
+                      console.log('44444444', start_to_node);
+                      console.log('55555555', dist_nodes[relayArray.indexOf(node)]);
+                      if (start_to_node < dist_nodes[relayArray.indexOf(node)]) {
+                        dist_nodes[relayArray.indexOf(node)] = start_to_node;
+                        last_node[relayArray.indexOf(node)] = compl_nodes[math.subtract(compl_nodes.length, 1)];
+                        console.log('222222', compl_nodes[compl_nodes.length - 1]);
+                        console.log('3333333', [relayArray[0], relayArray[1], relayArray[2]]);
+                      }
+                    }
+                    console.log('dist_nodes', dist_nodes);
+                  }
 
-          //       })
-          //       //
+                })
+                //
 
-          //       var min_dist = math.min(dist_nodes);
-          //       if (min_dist !== Infinity) {
-          //         compl_nodes.push(relayArray[dist_nodes.indexOf(min_dist)]);
-          //         console.log('min_dist', min_dist);
-          //         //在nodeArray中pop掉当前遍历到的node
-          //         nodeArray[dist_nodes.indexOf(min_dist)] = Infinity;
-          //         // nodeArray.splice(dist_nodes.indexOf(min_dist),1);
-          //         console.log('nodearray', nodeArray);
+                var min_dist = math.min(dist_nodes);
+                if (min_dist !== Infinity) {
+                  compl_nodes.push(relayArray[dist_nodes.indexOf(min_dist)]);
+                  console.log('min_dist', min_dist);
+                  //在nodeArray中pop掉当前遍历到的node
+                  nodeArray[dist_nodes.indexOf(min_dist)] = Infinity;
+                  // nodeArray.splice(dist_nodes.indexOf(min_dist),1);
+                  console.log('nodearray', nodeArray);
 
-          //         dist_nodes[dist_nodes.indexOf(min_dist)] = Infinity;
-          //       } else {
-          //         var is_break = 1;
-          //         break;
-          //       }
-          //     }
-          //     //
+                  dist_nodes[dist_nodes.indexOf(min_dist)] = Infinity;
+                } else {
+                  var is_break = 1;
+                  break;
+                }
+              }
+              //
 
-          //     if (is_break === 1) {
-          //       console.log('NO ROUTE!!!')
-          //     } else {
-          //       console.log('dist_nodes', dist_nodes);
-          //       console.log('last_node', last_node);
-          //       var route_array = [];
-          //       route_array.push(ray_end);
-          //       var route_node = last_node[last_node.length - 1];
-          //       route_array.push(route_node);
-          //       while (route_node !== ray_start) {
-          //         var index_now = relayArray.indexOf(route_node);
-          //         route_node = last_node[index_now];
-          //         route_array.push(route_node);
+              if (is_break === 1) {
+                console.log('NO ROUTE!!!')
+              } else {
+                console.log('dist_nodes', dist_nodes);
+                console.log('last_node', last_node);
+                var route_array = [];
+                route_array.push(ray_end);
+                var route_node = last_node[last_node.length - 1];
+                route_array.push(route_node);
+                while (route_node !== ray_start) {
+                  var index_now = relayArray.indexOf(route_node);
+                  route_node = last_node[index_now];
+                  route_array.push(route_node);
 
 
-          //       }
-          //       console.log('route_array', route_array);
-          //       var PL = math.square(math.divide(math.multiply(math.multiply(4, math.pi), min_dist), lam));
-          //       var PL_dB = math.multiply(10, math.log10(PL))
-          //       console.log('pathloss(dB) for shortest distance', PL_dB);
-          //       for (let i = 0; i <= route_array.length - 2; i++) {
-          //         // console.log('i and i+1',route_array[i],route_array[i+1]);
-          //         createLine(min_dist, route_array[i], route_array[i + 1]);
-          //       }
-          //     }
+                }
+                console.log('route_array', route_array);
+                var PL = math.square(math.divide(math.multiply(math.multiply(4, math.pi), min_dist), lam));
+                var PL_dB = math.multiply(10, math.log10(PL))
+                console.log('pathloss(dB) for shortest distance', PL_dB);
+                for (let i = 0; i <= route_array.length - 2; i++) {
+                  // console.log('i and i+1',route_array[i],route_array[i+1]);
+                  createLine(min_dist, route_array[i], route_array[i + 1]);
+                }
+              }
 
-          //   })
+            })
 
-          // })
+          })
+          // 88888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888/
           receiverArray.forEach((ray_end) => {
             antennaArray.forEach((ray_start) => {
 
@@ -693,14 +757,14 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
                     var ray_dir_los = Cesium.Cartesian3.normalize(Cesium.Cartesian3.subtract(node2, node1, new Cesium.Cartesian3()), new Cesium.Cartesian3());
                     var ray = new Cesium.Ray(node1, ray_dir_los);
                     var hitPos = viewer.scene.pickFromRay(ray, []);
-                    var point1 = viewer.entities.add({
-                      position: hitPos.position,
-                      point: {
-                      color: Cesium.Color.LIME,
-                      pixelSize: 10,
-                      heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
-                      },
-                    });
+                    // var point1 = viewer.entities.add({
+                    //   position: hitPos.position,
+                    //   point: {
+                    //   color: Cesium.Color.LIME,
+                    //   pixelSize: 10,
+                    //   heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
+                    //   },
+                    // });
                     var start_to_hit = math.distance([node1.x, node1.y, node1.z], [hitPos.position.x, hitPos.position.y, hitPos.position.z]);
                     var start_to_end = math.distance([node1.x, node1.y, node1.z], [node2.x, node2.y, node2.z]);
                     console.log('[node1,node2]',[node1,node2]);
@@ -814,9 +878,25 @@ var mel = Cesium.GeoJsonDataSource.load('../src/smallData.json', {
               }
               // console.log('group_list',group_list);
               console.log('result_path',result_path);
+              // for (let i=0; i<=result_path.length-1;i++){
+              //   createLine(20, result_path[i][0], result_path[i][1]);
+              // } 
+
+
+              var final_path=[];
               for (let i=0; i<=result_path.length-1;i++){
-                createLine(20, result_path[i][0], result_path[i][1]);
-              }  
+                var a=result_path[i].slice(0,2);
+                final_path.push(a);
+              }
+              console.log('final_path', final_path);
+              var AR_result = [];
+              var final_result=[];
+              var is_receive=0;
+              dfs(final_path, AR_result, ray_start, ray_end);
+              console.log('final_result',final_result);
+              // for (let i=0; i<=final_result.length-1;i++){
+              //   createLine(20, final_result[i][0], final_result[i][1]);
+              // } 
                
             })
           })
